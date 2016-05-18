@@ -105,7 +105,7 @@ window.ShopifyBuy = require('shopify-buy/shopify').default;
 
     const polyFilledGlobalsOutput = concat(mergeTrees([globalsOutput, polyfillTree]), {
       headerFiles: ['polyfills.js'],
-      inputFiles: `${pkg.name}.globals.js`,
+      inputFiles: ['**/*.js'],
       outputFile: `${pkg.name}.polyfilled.globals.js`
     });
 
