@@ -39,43 +39,37 @@ module.exports = function (pathConfig, env) {
     footer: `
 window.ShopifyBuy = require('shopify-buy/shopify').default;
 })();`,
-    outputFile: `${pkg.name}.globals.js`,
-    sourceMapConfig: { enabled: false }
+    outputFile: `${pkg.name}.globals.js`
   });
 
   if (env === 'production') {
     const amdOutput = concat(amdTree, {
       inputFiles: ['**/*.js'],
-      outputFile: `${pkg.name}.amd.js`,
-      sourceMapConfig: { enabled: false }
+      outputFile: `${pkg.name}.amd.js`
     });
 
     const polyFilledAmdOutput = concat(mergeTrees([amdOutput, polyfillTree]), {
       headerFiles: ['polyfills.js'],
-      inputFiles: `${pkg.name}.amd.js`,
-      outputFile: `${pkg.name}.polyfilled.amd.js`,
-      sourceMapConfig: { enabled: false }
+      inputFiles: ['**/*.js'],
+      outputFile: `${pkg.name}.polyfilled.amd.js`
     });
 
     const polyFilledGlobalsOutput = concat(mergeTrees([globalsOutput, polyfillTree]), {
       headerFiles: ['polyfills.js'],
-      inputFiles: `${pkg.name}.globals.js`,
-      outputFile: `${pkg.name}.polyfilled.globals.js`,
-      sourceMapConfig: { enabled: false }
+      inputFiles: ['**/*.js'],
+      outputFile: `${pkg.name}.polyfilled.globals.js`
     });
 
     const commonTree = sourceTree(pathConfig, 'common');
     const commonOutput = concat(commonTree, {
       inputFiles: ['**/*.js'],
-      outputFile: `${pkg.name}.common.js`,
-      sourceMapConfig: { enabled: false }
+      outputFile: `${pkg.name}.common.js`
     });
 
     const polyFilledCommonOutput = concat(mergeTrees([commonOutput, polyfillTree]), {
       headerFiles: ['polyfills.js'],
-      inputFiles: `${pkg.name}.common.js`,
-      outputFile: `${pkg.name}.polyfilled.common.js`,
-      sourceMapConfig: { enabled: false }
+      inputFiles: ['**/*.js'],
+      outputFile: `${pkg.name}.polyfilled.common.js`
     });
 
     const nodeLibOutput = funnel(commonTree, {
@@ -95,12 +89,13 @@ window.ShopifyBuy = require('shopify-buy/shopify').default;
     const minifiedTree = uglifyJavaScript(funnel(tree, {
       getDestinationPath: function (path) {
         return path.replace(/\.js/, '.min.js');
-      }
+      },
+      exclude: ['**/*.map']
     }));
 
-    const concatenatedScripts = new Licenser([mergeTrees([tree, minifiedTree])]);
+    const licensedScripts = new Licenser([mergeTrees([tree, minifiedTree], { overwrite : true })]);
 
-    tree = mergeTrees([concatenatedScripts, nodeLibOutput]);
+    tree = mergeTrees([tree, minifiedTree, licensedScripts, nodeLibOutput], { overwrite : true });
   } else {
     const amdOutput = concat(mergeTrees([amdTree, loaderTree]), {
       headerFiles: ['loader.js'],
@@ -111,8 +106,7 @@ window.ShopifyBuy = require('shopify-buy/shopify').default;
     const polyFilledGlobalsOutput = concat(mergeTrees([globalsOutput, polyfillTree]), {
       headerFiles: ['polyfills.js'],
       inputFiles: `${pkg.name}.globals.js`,
-      outputFile: `${pkg.name}.polyfilled.globals.js`,
-      sourceMapConfig: { enabled: false }
+      outputFile: `${pkg.name}.polyfilled.globals.js`
     });
 
     tree = mergeTrees([amdOutput, polyfillTree, globalsOutput, polyFilledGlobalsOutput]);
