@@ -93,9 +93,9 @@ window.ShopifyBuy = require('shopify-buy/shopify').default;
       exclude: ['**/*.map']
     }));
 
-    const licensedScripts = new Licenser([mergeTrees([tree, minifiedTree], { overwrite : true })]);
+    const licensedTree = new Licenser([mergeTrees([tree, minifiedTree])]);
 
-    tree = mergeTrees([tree, minifiedTree, licensedScripts, nodeLibOutput], { overwrite : true });
+    tree = mergeTrees([licensedTree, nodeLibOutput]);
   } else {
     const amdOutput = concat(mergeTrees([amdTree, loaderTree]), {
       headerFiles: ['loader.js'],
