@@ -1,4 +1,5 @@
 import Config from './config';
+import version from './version';
 import ShopClient from './shop-client';
 import './isomorphic-fetch';
 import './isomorphic-btoa';
@@ -16,6 +17,7 @@ import './isomorphic-btoa';
 const Shopify = {
   ShopClient,
   Config,
+  version,
 
   /**
    * Create a ShopClient. This is the main entry point to the SDK.
